@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  server:
+    container_name: server
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    env_file: .env
+    privileged: true
+    stdin_open: true
+    ports:
+      - 3001:3001
+    volumes:
+      - ".:/app/"
+    networks:
+      backend:
+    depends_on:
+      - postgres
+  postgres:
+    container_name: postgres_database
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      backend:
+
+networks:
+  backend:
+    name: backend
+    driver: bridge
+    ipam:
+      driver: default
+
+volumes:
+  postgres-volume: {}
